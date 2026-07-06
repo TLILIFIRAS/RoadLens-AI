@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RoadLens AI — AI-Powered Pavement Inspection Platform</title>
+<meta name="description" content="Upload road imagery, detect defects with YOLO26, compute PCI scores, and export professional inspection reports."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0F172A;--navy2:#1E293B;--amber:#F59E0B;--amber2:#FBBF24;--green:#10B981;--red:#EF4444;--orange:#F97316;--blue:#3B82F6;--gray:#64748B;--light:#E2E8F0;--white:#ffffff}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.mono{font-family:'JetBrains Mono',monospace}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,23,42,.88);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1rem}
+.nav-icon{width:32px;height:32px;background:var(--amber);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(245,158,11,.4)}
+.nav-links{display:flex;gap:2rem;font-size:.85rem;color:#94A3B8}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{background:var(--amber);color:var(--navy);font-weight:600;font-size:.8rem;padding:.45rem 1.1rem;border-radius:8px;transition:background .2s}
+.nav-cta:hover{background:var(--amber2)}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(245,158,11,.08) 0%,transparent 70%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.04) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--amber);font-size:.75rem;font-weight:600;padding:.35rem 1rem;border-radius:999px;margin-bottom:1.5rem}
+.badge-dot{width:6px;height:6px;background:var(--amber);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:clamp(2.4rem,6vw,4.5rem);font-weight:800;line-height:1.1;letter-spacing:-2px;max-width:800px}
+.hero h1 span{background:linear-gradient(90deg,var(--amber),#F97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:#94A3B8;font-size:1.1rem;max-width:580px;margin:1.5rem auto 2.5rem;line-height:1.7}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:3.5rem}
+.btn-p{background:var(--amber);color:var(--navy);font-weight:700;font-size:.9rem;padding:.75rem 2rem;border-radius:12px;box-shadow:0 8px 24px rgba(245,158,11,.3);transition:all .2s;display:flex;align-items:center;gap:8px}
+.btn-p:hover{background:var(--amber2);transform:translateY(-1px);box-shadow:0 12px 28px rgba(245,158,11,.4)}
+.btn-s{border:1px solid rgba(255,255,255,.15);color:#CBD5E1;font-size:.9rem;padding:.75rem 2rem;border-radius:12px;transition:all .2s;display:flex;align-items:center;gap:8px}
+.btn-s:hover{border-color:rgba(255,255,255,.3);color:var(--white);background:rgba(255,255,255,.05)}
+.stats{display:flex;gap:3rem;justify-content:center;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-val{font-size:1.8rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--white)}
+.stat-label{font-size:.75rem;color:#64748B;margin-top:2px}
+section{padding:6rem 2rem}
+.si{max-width:1100px;margin:0 auto}
+.slabel{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);margin-bottom:.75rem;text-align:center}
+.stitle{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:800;text-align:center;letter-spacing:-1px;margin-bottom:1rem}
+.ssub{color:#64748B;text-align:center;max-width:560px;margin:0 auto 3.5rem;font-size:.95rem;line-height:1.7}
+.pipeline{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:2rem;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0}
+.pstep{display:flex;align-items:center}
+.pbox{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--amber2);font-size:.78rem;font-weight:600;padding:.5rem 1rem;border-radius:8px;white-space:nowrap}
+.parrow{color:#334155;font-size:1.1rem;padding:0 .5rem}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem}
+.fc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.5rem;transition:all .2s}
+.fc:hover{border-color:rgba(245,158,11,.3);background:rgba(255,255,255,.05);transform:translateY(-2px)}
+.fi{width:42px;height:42px;background:rgba(245,158,11,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:1rem}
+.fc h3{font-size:.95rem;font-weight:700;margin-bottom:.4rem}
+.fc p{font-size:.83rem;color:#64748B;line-height:1.6}
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.dc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.75rem}
+.ddot{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:1rem}
+.dc h3{font-size:1rem;font-weight:700;margin-bottom:.3rem}
+.dc p{font-size:.82rem;color:#64748B;line-height:1.5;margin-bottom:1rem}
+.sbar{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden}
+.sfill{height:100%;border-radius:4px}
+.pcig{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem}
+.pcic{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:1.25rem}
+.pcirange{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;margin-bottom:.25rem}
+.pcilabel{font-size:.82rem;font-weight:600;margin-bottom:.3rem}
+.pcidesc{font-size:.75rem;color:#64748B;line-height:1.4}
+.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.rc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.75rem;text-align:center}
+.rbadge{display:inline-block;font-size:.7rem;font-weight:700;padding:.3rem .8rem;border-radius:999px;margin-bottom:1rem}
+.rc h3{font-size:1rem;font-weight:700;margin-bottom:.75rem}
+.rperms{list-style:none;text-align:left}
+.rperms li{font-size:.82rem;color:#94A3B8;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:8px}
+.rperms li::before{content:"✓";color:var(--green);font-size:.75rem;flex-shrink:0}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem}
+.sp{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.6rem 1rem;font-size:.82rem;font-weight:500}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.alt{background:#080F1E}
+footer{background:#0A1020;border-top:1px solid rgba(255,255,255,.06);padding:3rem 2rem;text-align:center}
+.flogo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:1rem;font-weight:700}
+.flinks{display:flex;gap:1.5rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap}
+.flinks a{color:#64748B;font-size:.85rem;transition:color .2s}
+.flinks a:hover{color:var(--amber)}
+.fcredit{color:#334155;font-size:.8rem}
+.fcredit a{color:var(--amber)}
+@media(max-width:768px){.dg,.rg{grid-template-columns:1fr}.nav-links{display:none}.stats{gap:1.5rem}.pipeline{flex-direction:column;align-items:flex-start;gap:.5rem}.parrow{transform:rotate(90deg)}.sg{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">
+    <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" width="18" height="18" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg></div>
+    RoadLens AI
+  </div>
+  <div class="nav-links">
+    <a href="#demo">Demo</a><a href="#features">Features</a><a href="#defects">Defects</a><a href="#pci">PCI</a><a href="#roles">Roles</a><a href="#stack">Stack</a>
+  </div>
+  <a href="https://github.com/TLILIFIRAS" class="nav-cta" target="_blank">GitHub →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="badge"><span class="badge-dot"></span>AI-Powered · YOLO26 · FastAPI · React</div>
+  <h1>Smarter Road<br/><span>Inspection</span></h1>
+  <p>Upload road imagery, detect cracks, potholes, and manholes in seconds, compute a PCI score, and export professional inspection reports — all in one collaborative platform.</p>
+  <div class="hero-btns">
+    <a href="https://github.com/TLILIFIRAS" class="btn-p" target="_blank">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.3 3.5 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.65.25 2.87.12 3.17.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.69.83.57C20.57 21.79 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      View on GitHub
+    </a>
+    <a href="https://www.linkedin.com/in/firastlili/" class="btn-s" target="_blank">LinkedIn</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-val mono">3</div><div class="stat-label">Defect Classes</div></div>
+    <div class="stat"><div class="stat-val mono">0–100</div><div class="stat-label">PCI Scale</div></div>
+    <div class="stat"><div class="stat-val mono">PDF</div><div class="stat-label">&amp; CSV Export</div></div>
+    <div class="stat"><div class="stat-val mono">JWT</div><div class="stat-label">Auth + Roles</div></div>
+    <div class="stat"><div class="stat-val mono">YOLO26</div><div class="stat-label">AI Model</div></div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="si">
+    <div class="slabel">Demo</div>
+    <h2 class="stitle">See It in Action</h2>
+    <p class="ssub">Watch a full walkthrough of the platform — from uploading road imagery to generating a PDF inspection report.</p>
+    <div style="position:relative;border-radius:16px;border:1px solid rgba(255,255,255,.08);box-shadow:0 24px 64px rgba(0,0,0,.5);overflow:hidden;background:#0A1020">
+      <!-- Thumbnail linking to YouTube -->
+      <a href="https://www.youtube.com/watch?v=FpNz4Gg3nFs" target="_blank" rel="noopener noreferrer"
+         style="display:block;position:relative;cursor:pointer">
+        <img
+          src="https://img.youtube.com/vi/FpNz4Gg3nFs/maxresdefault.jpg"
+          alt="RoadLens AI Demo Video"
+          onerror="this.src='https://img.youtube.com/vi/FpNz4Gg3nFs/hqdefault.jpg'"
+          style="width:100%;display:block;border-radius:16px;opacity:.85;transition:opacity .2s"
+          onmouseover="this.style.opacity='1'"
+          onmouseout="this.style.opacity='.85'"
+        />
+        <!-- Play button overlay -->
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem">
+          <div style="width:80px;height:80px;background:rgba(245,158,11,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(245,158,11,.5);transition:transform .2s"
+               onmouseover="this.style.transform='scale(1.1)'"
+               onmouseout="this.style.transform='scale(1)'">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="#0F172A"><polygon points="5,3 19,12 5,21"/></svg>
+          </div>
+          <span style="color:#fff;font-weight:600;font-size:.9rem;background:rgba(0,0,0,.5);padding:.35rem .9rem;border-radius:999px;backdrop-filter:blur(6px)">Watch on YouTube</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="si">
+    <div class="slabel">Workflow</div>
+    <h2 class="stitle">How It Works</h2>
+    <p class="ssub">From raw road imagery to a signed-off inspection report.</p>
+    <div class="pipeline">
+      <div class="pstep"><div class="pbox">📁 Upload Images</div><div class="parrow">→</div></div>
+      <div class="pstep"><div class="pbox">🤖 YOLO26 Detection</div><div class="parrow">→</div></div>
+      <div class="pstep"><div class="pbox">🎨 OpenCV Annotation</div><div class="parrow">→</div></div>
+      <div class="pstep"><div class="pbox">📊 PCI Calculation</div><div class="parrow">→</div></div>
+      <div class="pstep"><div class="pbox">✅ Engineer Review</div><div class="parrow">→</div></div>
+      <div class="pstep"><div class="pbox">📄 PDF / CSV Export</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="si">
+    <div class="slabel">Platform</div>
+    <h2 class="stitle">Everything You Need</h2>
+    <p class="ssub">A complete end-to-end inspection platform built for civil engineers and field teams.</p>
+    <div class="fg">
+      <div class="fc"><div class="fi">🤖</div><h3>AI Defect Detection</h3><p>YOLO26 detects cracks, potholes, and manholes with bounding boxes and confidence scores in seconds.</p></div>
+      <div class="fc"><div class="fi">📊</div><h3>PCI Scoring</h3><p>Density-based logarithmic Pavement Condition Index (0–100) computed automatically per inspection.</p></div>
+      <div class="fc"><div class="fi">🎚️</div><h3>Confidence Threshold</h3><p>Adjustable detection sensitivity per inspection from 15% to 75% — balance precision vs recall.</p></div>
+      <div class="fc"><div class="fi">🖼️</div><h3>Before/After Slider</h3><p>Drag to compare original and AI-annotated imagery side by side. Highlights clip to the annotated side only.</p></div>
+      <div class="fc"><div class="fi">🔍</div><h3>Detection Highlighting</h3><p>Click any detection to highlight its bounding box with a glowing overlay directly on the image.</p></div>
+      <div class="fc"><div class="fi">🗂️</div><h3>Image Gallery</h3><p>Grid view of all inspection images with defect count badges, lightbox, and compare shortcuts.</p></div>
+      <div class="fc"><div class="fi">✅</div><h3>Engineer Review</h3><p>Confirm, flag, or dismiss each AI detection before finalizing. Every action is attributed to the reviewer.</p></div>
+      <div class="fc"><div class="fi">📝</div><h3>Engineer Notes</h3><p>Add inline notes per detection. Saved instantly, displayed below the card, included in PDF reports.</p></div>
+      <div class="fc"><div class="fi">🔄</div><h3>Bulk Re-analyze</h3><p>Re-run YOLO on an existing inspection with a new threshold without creating a new inspection.</p></div>
+      <div class="fc"><div class="fi">📄</div><h3>PDF Reports</h3><p>Branded reports with annotated images, PCI score, defect tables, engineer notes, and attribution.</p></div>
+      <div class="fc"><div class="fi">📋</div><h3>CSV Export</h3><p>Structured data export with all detection metadata, bbox coordinates, and actioned-by tracking.</p></div>
+      <div class="fc"><div class="fi">🗺️</div><h3>Map View</h3><p>Auto-geocoded project pins on OpenStreetMap, color-coded by PCI score for instant spatial overview.</p></div>
+      <div class="fc"><div class="fi">📈</div><h3>Analytics Dashboard</h3><p>Defect distribution pie, PCI trend area chart, defects per inspection bar chart, status breakdown.</p></div>
+      <div class="fc"><div class="fi">👥</div><h3>Multi-user Auth</h3><p>JWT-based login with three roles. Full activity attribution — every action tracked to the responsible user.</p></div>
+      <div class="fc"><div class="fi">🏢</div><h3>Team Collaboration</h3><p>Shared projects across the team. Multiple engineers can work on the same inspection simultaneously.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="defects" class="alt">
+  <div class="si">
+    <div class="slabel">Detection</div>
+    <h2 class="stitle">Defect Classes</h2>
+    <p class="ssub">Three categories detected automatically, each with a severity weight that feeds into the PCI score.</p>
+    <div class="dg">
+      <div class="dc"><div class="ddot" style="background:rgba(239,68,68,.15)">🕳️</div><h3>Pothole</h3><p>Surface depressions posing immediate safety risk. Highest severity in the scoring model.</p><span style="font-size:.75rem;color:#EF4444;font-weight:600">HIGH · weight × 1.0</span><div class="sbar" style="margin-top:.75rem"><div class="sfill" style="width:100%;background:#EF4444"></div></div></div>
+      <div class="dc"><div class="ddot" style="background:rgba(249,115,22,.15)">⚡</div><h3>Crack</h3><p>Surface cracking indicating structural stress, fatigue, or water infiltration damage.</p><span style="font-size:.75rem;color:#F97316;font-weight:600">MEDIUM · weight × 0.4</span><div class="sbar" style="margin-top:.75rem"><div class="sfill" style="width:60%;background:#F97316"></div></div></div>
+      <div class="dc"><div class="ddot" style="background:rgba(148,163,184,.15)">🔘</div><h3>Manhole</h3><p>Manhole cover detection for infrastructure mapping and surface condition logging.</p><span style="font-size:.75rem;color:#94A3B8;font-weight:600">LOW · weight × 0.1</span><div class="sbar" style="margin-top:.75rem"><div class="sfill" style="width:20%;background:#94A3B8"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="pci">
+  <div class="si">
+    <div class="slabel">Scoring</div>
+    <h2 class="stitle">Pavement Condition Index</h2>
+    <p class="ssub">PCI is a numerical rating from 0 (failed) to 100 (excellent), calculated using a density-based logarithmic deduction model.</p>
+    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.5rem 2rem;text-align:center;margin-bottom:2rem">
+      <p style="color:#64748B;font-size:.8rem;margin-bottom:.75rem">Scoring Formula</p>
+      <p class="mono" style="font-size:1rem;color:#fff;line-height:1.8">PCI = 100 &minus; &Sigma; ( 30 &times; log(1 + density<sub style="font-size:.7rem">type</sub>) &times; weight<sub style="font-size:.7rem">type</sub> )</p>
+      <div style="display:flex;justify-content:center;gap:2rem;margin-top:1rem;flex-wrap:wrap">
+        <span style="font-size:.8rem;color:#64748B"><span style="color:#EF4444" class="mono">pothole</span> &times; 1.0</span>
+        <span style="font-size:.8rem;color:#64748B"><span style="color:#F97316" class="mono">crack</span> &times; 0.4</span>
+        <span style="font-size:.8rem;color:#64748B"><span style="color:#94A3B8" class="mono">manhole</span> &times; 0.1</span>
+      </div>
+    </div>
+    <div class="pcig">
+      <div class="pcic"><div class="pcirange" style="color:#10B981">85–100</div><div class="pcilabel" style="color:#10B981">Excellent</div><div class="pcidesc">No visible distress. Routine monitoring only.</div></div>
+      <div class="pcic"><div class="pcirange" style="color:#34D399">70–84</div><div class="pcilabel" style="color:#34D399">Very Good</div><div class="pcidesc">Minor defects. Preventive treatment advised.</div></div>
+      <div class="pcic"><div class="pcirange" style="color:#A3E635">55–69</div><div class="pcilabel" style="color:#A3E635">Good</div><div class="pcidesc">Some deterioration. Schedule maintenance.</div></div>
+      <div class="pcic"><div class="pcirange" style="color:#FBBF24">40–54</div><div class="pcilabel" style="color:#FBBF24">Fair</div><div class="pcidesc">Moderate distress. Maintenance overdue.</div></div>
+      <div class="pcic"><div class="pcirange" style="color:#F97316">25–39</div><div class="pcilabel" style="color:#F97316">Poor</div><div class="pcidesc">Serious damage. Rehabilitation recommended.</div></div>
+      <div class="pcic"><div class="pcirange" style="color:#EF4444">0–24</div><div class="pcilabel" style="color:#EF4444">Very Poor/Failed</div><div class="pcidesc">Severe failure. Urgent intervention required.</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="roles" class="alt">
+  <div class="si">
+    <div class="slabel">Access Control</div>
+    <h2 class="stitle">Role-Based Access</h2>
+    <p class="ssub">Three roles designed for real civil engineering team workflows.</p>
+    <div class="rg">
+      <div class="rc"><div class="rbadge" style="background:rgba(59,130,246,.15);color:#60A5FA">Technicien</div><h3>Field Technician</h3><ul class="rperms"><li>Create new inspections</li><li>Upload road imagery</li><li>View AI results</li><li>Access all projects</li></ul></div>
+      <div class="rc"><div class="rbadge" style="background:rgba(245,158,11,.15);color:#FCD34D">Engineer</div><h3>Field Engineer</h3><ul class="rperms"><li>All Technicien permissions</li><li>Confirm / flag / dismiss detections</li><li>Add engineer notes per detection</li><li>Export PDF &amp; CSV reports</li><li>Mark inspections complete</li></ul></div>
+      <div class="rc"><div class="rbadge" style="background:rgba(16,185,129,.15);color:#34D399">Manager</div><h3>Project Manager</h3><ul class="rperms"><li>All Engineer permissions</li><li>Manage team members</li><li>Change user roles</li><li>Enable / disable accounts</li><li>Full platform oversight</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="si">
+    <div class="slabel">Built With</div>
+    <h2 class="stitle">Tech Stack</h2>
+    <p class="ssub">Production-grade tools chosen for performance, reliability, and developer experience.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+      <div>
+        <p style="font-size:.8rem;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem">Backend</p>
+        <div class="sg">
+          <div class="sp"><div class="sdot" style="background:#10B981"></div>FastAPI</div>
+          <div class="sp"><div class="sdot" style="background:#F97316"></div>YOLO26</div>
+          <div class="sp"><div class="sdot" style="background:#EF4444"></div>OpenCV</div>
+          <div class="sp"><div class="sdot" style="background:#A78BFA"></div>SQLite</div>
+          <div class="sp"><div class="sdot" style="background:#60A5FA"></div>SQLAlchemy</div>
+          <div class="sp"><div class="sdot" style="background:#FBBF24"></div>ReportLab</div>
+          <div class="sp"><div class="sdot" style="background:#F472B6"></div>python-jose</div>
+          <div class="sp"><div class="sdot" style="background:#94A3B8"></div>passlib</div>
+          <div class="sp"><div class="sdot" style="background:#34D399"></div>Pydantic v2</div>
+          <div class="sp"><div class="sdot" style="background:#6EE7B7"></div>Uvicorn</div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:.8rem;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem">Frontend</p>
+        <div class="sg">
+          <div class="sp"><div class="sdot" style="background:#38BDF8"></div>React 19</div>
+          <div class="sp"><div class="sdot" style="background:#3B82F6"></div>TypeScript</div>
+          <div class="sp"><div class="sdot" style="background:#A78BFA"></div>Vite 8</div>
+          <div class="sp"><div class="sdot" style="background:#38BDF8"></div>Tailwind v4</div>
+          <div class="sp"><div class="sdot" style="background:#F59E0B"></div>Recharts</div>
+          <div class="sp"><div class="sdot" style="background:#10B981"></div>Leaflet.js</div>
+          <div class="sp"><div class="sdot" style="background:#60A5FA"></div>Axios</div>
+          <div class="sp"><div class="sdot" style="background:#F472B6"></div>React Router</div>
+          <div class="sp"><div class="sdot" style="background:#94A3B8"></div>Lucide React</div>
+          <div class="sp"><div class="sdot" style="background:#FCD34D"></div>react-dropzone</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" style="padding:5rem 2rem">
+  <div class="si" style="text-align:center">
+    <div style="width:64px;height:64px;background:rgba(245,158,11,.12);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.8rem">🛣️</div>
+    <h2 class="stitle">Ready to Inspect Smarter?</h2>
+    <p style="color:#64748B;max-width:480px;margin:1rem auto 2rem;font-size:.95rem;line-height:1.7">Clone the repo, run one command, and start your first AI-powered pavement inspection in under two minutes.</p>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:1rem 1.5rem;display:inline-block;margin-bottom:2rem">
+      <p class="mono" style="font-size:.85rem;color:#94A3B8">cd frontend &amp;&amp; npm run dev</p>
+    </div>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://github.com/TLILIFIRAS" class="btn-p" target="_blank">View on GitHub</a>
+      <a href="https://www.linkedin.com/in/firastlili/" class="btn-s" target="_blank">Connect on LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="flogo">
+    <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" width="16" height="16" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg></div>
+    RoadLens AI
+  </div>
+  <div class="flinks">
+    <a href="#features">Features</a><a href="#defects">Defect Classes</a><a href="#pci">PCI Score</a><a href="#roles">Roles</a><a href="#stack">Tech Stack</a><a href="#demo">Demo</a>
+    <a href="https://github.com/TLILIFIRAS" target="_blank">GitHub</a><a href="https://www.linkedin.com/in/firastlili/" target="_blank">LinkedIn</a>
+  </div>
+  <p class="fcredit">Made with ❤️ by <a href="https://www.linkedin.com/in/firastlili/" target="_blank">Eng. Firas Tlili</a> &nbsp;·&nbsp; Built with FastAPI + React + YOLO26</p>
+</footer>
+</body>
+</html>
