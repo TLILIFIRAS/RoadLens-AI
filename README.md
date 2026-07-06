@@ -2,7 +2,7 @@
 
 # 🛣️ RoadLens AI — AI-Powered Pavement Inspection Platform
 
-[![Demo Video](https://img.shields.io/badge/Demo-YouTube-ff0000?style=for-the-badge&logo=youtube&logoColor=white)]([https://www.youtube.com](https://www.youtube.com/watch?v=FpNz4Gg3nFs))
+[![Demo Video](https://img.shields.io/badge/Demo-YouTube-ff0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=FpNz4Gg3nFs)
 [![GitHub](https://img.shields.io/badge/GitHub-TLILIFIRAS-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/TLILIFIRAS)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Firas%20Tlili-0a66c2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/firastlili/)
 
