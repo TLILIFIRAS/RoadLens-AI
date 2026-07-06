@@ -17,7 +17,7 @@ Upload road imagery, detect defects automatically with YOLO26, review AI detecti
 
 | Resource | URL |
 |----------|-----|
-| 🎬 Demo Video | Coming soon |
+| 🎬 Demo Video | [https://www.youtube.com/watch?v=FpNz4Gg3nFs]([https://www.linkedin.com/in/firastlili/](https://www.youtube.com/watch?v=FpNz4Gg3nFs)) |
 | 💼 LinkedIn | [linkedin.com/in/firastlili](https://www.linkedin.com/in/firastlili/) |
 | 🐙 GitHub | [github.com/TLILIFIRAS](https://github.com/TLILIFIRAS) |
 
